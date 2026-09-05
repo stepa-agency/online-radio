@@ -59,9 +59,11 @@ export default function NowPlaying({ nowPlaying, status, onSkip, skipping }) {
           {playing ? "Пауза" : "Слушать"}
         </button>
         <span className="now-playing__time">{formatTime(remaining)}</span>
-        <button className="pill pill--solid" onClick={onSkip} disabled={skipping}>
-          {skipping ? "..." : "Skip →"}
-        </button>
+        {onSkip && (
+          <button className="pill pill--solid" onClick={onSkip} disabled={skipping}>
+            {skipping ? "..." : "Skip →"}
+          </button>
+        )}
       </div>
 
       <audio ref={audioRef} src={STREAM_URL} preload="none" />

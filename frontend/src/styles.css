@@ -67,6 +67,32 @@ input {
   padding: 12px 0 36px;
 }
 
+.app__header--admin {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.app__header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.badge--admin {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.app__public-link {
+  font-size: 13px;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+
+.app__public-link:hover {
+  color: var(--ink);
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -84,6 +110,17 @@ input {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+.app--listener {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.app--listener .app__header {
+  padding-bottom: 48px;
 }
 
 .app__grid {
