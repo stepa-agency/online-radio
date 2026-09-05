@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "Kommuna";
+  src: url("/fonts/KommunaNormal.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Kommuna Narrow";
+  src: url("/fonts/KommunaNarrow.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #f2efe6;
   --card: #ffffff;
@@ -10,8 +26,8 @@
   --radius-lg: 22px;
   --radius-md: 14px;
   --radius-pill: 999px;
-  --font-display: "Space Grotesk", system-ui, sans-serif;
-  --font-serif: "Instrument Serif", Georgia, serif;
+  --font-display: "Kommuna", system-ui, sans-serif;
+  --font-serif: "Kommuna Narrow", system-ui, sans-serif;
 }
 
 * {
@@ -101,7 +117,6 @@ input {
 
 .logo__text {
   font-family: var(--font-serif);
-  font-style: italic;
   font-size: 26px;
   letter-spacing: 0.01em;
 }
@@ -337,7 +352,6 @@ input {
 
 .queue__index {
   font-family: var(--font-serif);
-  font-style: italic;
   font-size: 20px;
   color: var(--ink-faint);
   width: 28px;
@@ -467,7 +481,6 @@ input {
 
 .listener__brand-text {
   font-family: var(--font-serif);
-  font-style: italic;
   font-size: 22px;
   letter-spacing: 0.01em;
 }
@@ -502,7 +515,6 @@ input {
 .listener__message {
   margin: 0;
   font-family: var(--font-serif);
-  font-style: italic;
   font-size: clamp(32px, 9vw, 120px);
   line-height: 1.2;
   max-width: 1100px;
@@ -537,8 +549,54 @@ input {
 }
 
 .listener__volume {
-  width: 160px;
-  accent-color: var(--ink-soft);
+  -webkit-appearance: none;
+  appearance: none;
+  width: min(320px, 70vw);
+  height: 16px;
+  background: transparent;
+  cursor: pointer;
+}
+
+.listener__volume:focus-visible {
+  outline: 2px solid var(--ink-soft);
+  outline-offset: 6px;
+}
+
+.listener__volume::-webkit-slider-runnable-track {
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+}
+
+.listener__volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ink);
+  margin-top: -5px;
+}
+
+.listener__volume::-moz-range-track {
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+}
+
+.listener__volume::-moz-range-progress {
+  height: 2px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-soft);
+}
+
+.listener__volume::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ink);
 }
 
 /* ---- ambient glow ---- */

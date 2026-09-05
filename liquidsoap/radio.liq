@@ -11,26 +11,17 @@ settings.server.telnet.port.set(1234)
 
 icecast_password = environment.get(default="hackme", "ICECAST_SOURCE_PASSWORD")
 
-# --- Sources -----------------------------------------------------------
+# --- Source --------------------------------------------------------------
 
-# Priority queue: tracks pushed at runtime via telnet play first.
+# The ONLY thing that ever plays: tracks explicitly pushed here (the app's
+# "Play next" button, or directly over telnet). No background rotation over
+# /music — a file sitting in that folder never plays on its own, so nothing
+# unqueued ever ends up on air.
 #   telnet> queue.push /music/some-track.mp3
 queue = request.queue(id="queue")
 
-# Background rotation: everything currently sitting in /music.
-# reload_mode="watch" makes it pick up new/removed files immediately,
-# so the Node.js API can just drop files into /music.
-#   telnet> music.skip     -> force the playlist to move on
-#   telnet> music.reload   -> force a manual rescan of the folder
-music = playlist(id="music", mode="normal", reload_mode="watch", "/music")
-
-# Queued requests take priority over the background rotation; whichever
-# is currently playing advances to the next track automatically.
-radio = fallback(track_sensitive=false, [queue, music])
-
-# Never let the stream die: fall back to silence instead of crashing if
-# both the queue and the music folder are empty.
-radio = mksafe(radio)
+# Silence instead of crashing when the queue runs dry.
+radio = mksafe(queue)
 
 # --- Output --------------------------------------------------------------
 
