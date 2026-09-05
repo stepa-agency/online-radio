@@ -203,6 +203,18 @@ input {
   gap: 10px;
 }
 
+.now-playing__on-air-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
 .now-playing__title {
   margin: 0;
   font-size: clamp(32px, 5vw, 56px);
@@ -217,9 +229,48 @@ input {
   color: var(--ink-soft);
 }
 
+.now-playing__idle {
+  padding: 12px 0 4px;
+}
+
+.now-playing__idle-title {
+  margin: 0 0 6px;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+
+.now-playing__idle-hint {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.now-playing__progress {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.now-playing__progress-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--line);
+  overflow: hidden;
+}
+
+.now-playing__progress-fill {
+  height: 100%;
+  background: var(--ink);
+  border-radius: var(--radius-pill);
+  transition: width 1s linear;
+}
+
 .now-playing__controls {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 18px;
 }
 
@@ -227,7 +278,7 @@ input {
   font-variant-numeric: tabular-nums;
   font-size: 15px;
   color: var(--ink-soft);
-  margin-right: auto;
+  flex-shrink: 0;
 }
 
 /* ---- pills ---- */
@@ -330,6 +381,12 @@ input {
   margin: 0;
 }
 
+.queue__hint {
+  margin: -8px 0 16px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+
 .queue__list {
   list-style: none;
   margin: 0;
@@ -350,12 +407,32 @@ input {
   border-top: none;
 }
 
+.queue__item--playing {
+  background: rgba(255, 59, 47, 0.05);
+  margin: 0 -16px;
+  padding: 16px;
+  border-top-color: transparent;
+  border-radius: var(--radius-md);
+}
+
 .queue__index {
   font-family: var(--font-serif);
   font-size: 20px;
   color: var(--ink-faint);
   width: 28px;
   flex-shrink: 0;
+}
+
+.queue__on-air {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--red);
+  white-space: nowrap;
 }
 
 .queue__meta {

@@ -19,11 +19,19 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
+    // The queue advances itself server-side, so keep polling it — a track
+    // can go from "queued" to "playing" to gone without the admin clicking
+    // anything.
     refreshTracks();
+    const id = setInterval(refreshTracks, 4000);
+    return () => clearInterval(id);
+  }, [refreshTracks]);
+
+  useEffect(() => {
     // Fetched once: the admin is the source of truth while editing, so we
     // don't want a poll to overwrite what they're typing.
     api.getMessage().then((data) => setMessage(data.text)).catch(() => {});
-  }, [refreshTracks]);
+  }, []);
 
   const handleUpload = async (formData) => {
     await api.uploadTrack(formData);
@@ -42,11 +50,12 @@ export default function AdminPage() {
     }
   };
 
-  const handlePlayNext = async (id) => {
+  const handlePlayNow = async (id) => {
     setBusyId(id);
     try {
-      await api.playNext(id);
+      await api.playNow(id);
       refresh();
+      refreshTracks();
     } catch (err) {
       setError(err.message);
     } finally {
@@ -91,7 +100,7 @@ export default function AdminPage() {
         <NowPlaying nowPlaying={nowPlaying} status={status} onSkip={handleSkip} skipping={skipping} />
 
         <div className="app__grid">
-          <Queue tracks={tracks} onPlayNext={handlePlayNext} onDelete={handleDelete} busyId={busyId} />
+          <Queue tracks={tracks} onPlayNow={handlePlayNow} onDelete={handleDelete} busyId={busyId} />
           <div className="app__side">
             <UploadForm onUpload={handleUpload} />
             <MessageForm initialText={message} onSave={handleSaveMessage} />

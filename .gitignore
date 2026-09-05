@@ -3,6 +3,9 @@
 node_modules/
 api/data/
 
+# local deploy tooling — contains a live Vercel auth token, never commit
+tools/
+
 # don't commit actual audio files, just keep the folder
 music/*
 !music/.gitkeep

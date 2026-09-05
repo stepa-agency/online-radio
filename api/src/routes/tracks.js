@@ -54,23 +54,36 @@ router.post("/", upload.single("file"), (req, res) => {
   res.status(201).json(track);
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", async (req, res) => {
   const track = db.prepare("SELECT * FROM tracks WHERE id = ?").get(req.params.id);
   if (!track) return res.status(404).json({ error: "Track not found" });
+
+  if (track.status === "playing") {
+    try {
+      await liquidsoap.sendCommand("radio.skip");
+    } catch (err) {
+      return res.status(502).json({ error: `Liquidsoap error: ${err.message}` });
+    }
+  }
+
   db.prepare("DELETE FROM tracks WHERE id = ?").run(req.params.id);
   res.status(204).end();
 });
 
-// Jumps this track to the front of Liquidsoap's live queue right now.
-router.post("/:id/play-next", async (req, res) => {
+// Cuts off whatever's on air (if anything) and plays this track immediately,
+// ahead of the rest of the queue. The auto-advance loop picks up from here
+// once it finishes — normal queue order resumes after it.
+router.post("/:id/play-now", async (req, res) => {
   const track = db.prepare("SELECT * FROM tracks WHERE id = ?").get(req.params.id);
   if (!track) return res.status(404).json({ error: "Track not found" });
 
   try {
+    await liquidsoap.sendCommand("queue.flush_and_skip");
     const filePath = path.join(MUSIC_DIR, track.filename);
-    const requestId = await liquidsoap.sendCommand(`queue.push ${filePath}`);
+    await liquidsoap.sendCommand(`queue.push ${filePath}`);
+    db.prepare("DELETE FROM tracks WHERE status = 'playing' AND id != ?").run(track.id);
     db.prepare("UPDATE tracks SET status = 'playing' WHERE id = ?").run(track.id);
-    res.json({ ok: true, requestId });
+    res.json({ ok: true });
   } catch (err) {
     res.status(502).json({ error: `Liquidsoap error: ${err.message}` });
   }

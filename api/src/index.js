@@ -4,6 +4,7 @@ const db = require("./db");
 const tracksRouter = require("./routes/tracks");
 const controlRouter = require("./routes/control");
 const messageRouter = require("./routes/message");
+const { startAutoAdvance } = require("./autoAdvance");
 
 const app = express();
 app.use(cors());
@@ -21,8 +22,10 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`API listening on port ${PORT}`));
+const autoAdvanceTimer = startAutoAdvance();
 
 function shutdown() {
+  clearInterval(autoAdvanceTimer);
   server.close(() => {
     db.close();
     process.exit(0);
