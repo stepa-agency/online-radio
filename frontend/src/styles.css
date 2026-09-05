@@ -685,39 +685,39 @@ input {
 }
 
 .bloub-peek--top {
-  top: -110px;
-  left: 50%;
+  top: -250px;
+  left: var(--bloub-pos, 50%);
   transform: translate(-50%, 0);
 }
 .bloub-peek--top[data-visible="true"] {
-  transform: translate(-50%, 100px);
+  transform: translate(-50%, 230px);
 }
 
 .bloub-peek--bottom {
-  bottom: -110px;
-  left: 50%;
+  bottom: -250px;
+  left: var(--bloub-pos, 50%);
   transform: translate(-50%, 0);
 }
 .bloub-peek--bottom[data-visible="true"] {
-  transform: translate(-50%, -100px);
+  transform: translate(-50%, -230px);
 }
 
 .bloub-peek--left {
-  left: -110px;
-  top: 50%;
+  left: -250px;
+  top: var(--bloub-pos, 50%);
   transform: translate(0, -50%);
 }
 .bloub-peek--left[data-visible="true"] {
-  transform: translate(100px, -50%);
+  transform: translate(230px, -50%);
 }
 
 .bloub-peek--right {
-  right: -110px;
-  top: 50%;
+  right: -250px;
+  top: var(--bloub-pos, 50%);
   transform: translate(0, -50%);
 }
 .bloub-peek--right[data-visible="true"] {
-  transform: translate(-100px, -50%);
+  transform: translate(-230px, -50%);
 }
 
 /* ---- listener count ---- */
