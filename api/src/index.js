@@ -22,6 +22,11 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => console.log(`API listening on port ${PORT}`));
+// Node's defaults (5min request timeout, 1min headers timeout) are meant
+// for ordinary API calls — an hours-long podcast upload over a slow
+// connection can legitimately take longer than that, so don't cut it off.
+server.requestTimeout = 0;
+server.headersTimeout = 0;
 const autoAdvanceTimer = startAutoAdvance();
 
 function shutdown() {

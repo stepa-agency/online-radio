@@ -5,7 +5,7 @@ const db = require("../db");
 const liquidsoap = require("../liquidsoap");
 
 const MUSIC_DIR = process.env.MUSIC_DIR || "/music";
-const ALLOWED_EXT = new Set([".mp3", ".ogg", ".wav", ".flac", ".m4a"]);
+const ALLOWED_EXT = new Set([".mp3", ".ogg", ".wav", ".flac", ".m4a", ".m4b"]);
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, MUSIC_DIR),
@@ -23,7 +23,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 50 * 1024 * 1024 },
+  // No size cap — podcasts and audiobook chapters can run for hours.
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
     if (!ALLOWED_EXT.has(ext)) {

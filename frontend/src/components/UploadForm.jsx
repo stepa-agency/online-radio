@@ -46,7 +46,7 @@ export default function UploadForm({ onUpload }) {
       <p className="label">Добавить треки</p>
       <form className="upload__form" onSubmit={handleSubmit}>
         <label className="upload__dropzone">
-          <input ref={fileInputRef} type="file" multiple accept=".mp3,.ogg,.wav,.flac,.m4a" onChange={handleFileChange} />
+          <input ref={fileInputRef} type="file" multiple accept=".mp3,.ogg,.wav,.flac,.m4a,.m4b" onChange={handleFileChange} />
           <span>{fileLabel || "mp3, ogg, wav, flac, m4a — можно выбрать сразу несколько"}</span>
         </label>
 

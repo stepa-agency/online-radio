@@ -4,8 +4,12 @@ import { STREAM_URL } from "../api";
 function formatTime(seconds) {
   if (seconds == null || Number.isNaN(seconds)) return "--:--";
   const s = Math.max(0, Math.floor(seconds));
-  const m = Math.floor(s / 60);
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
   const rem = s % 60;
+  // Podcasts and audiobook chapters can run for hours — fall back to
+  // H:MM:SS instead of letting the minutes climb past 59.
+  if (h > 0) return `${h}:${String(m).padStart(2, "0")}:${String(rem).padStart(2, "0")}`;
   return `${m}:${String(rem).padStart(2, "0")}`;
 }
 
