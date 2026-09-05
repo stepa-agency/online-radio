@@ -6,12 +6,33 @@ import SoundIcon from "../components/SoundIcon.jsx";
 import BloubPeek from "../components/BloubPeek.jsx";
 import ListenerCount from "../components/ListenerCount.jsx";
 
+// Warms up the DNS/TLS/TCP handshake to the stream host ahead of the first
+// click, without ever requesting the stream itself — a <link preconnect>
+// doesn't touch the mount, so it can't inflate Icecast's listener count.
+function usePreconnect(url) {
+  useEffect(() => {
+    let origin;
+    try {
+      origin = new URL(url).origin;
+    } catch {
+      return;
+    }
+    const link = document.createElement("link");
+    link.rel = "preconnect";
+    link.href = origin;
+    document.head.appendChild(link);
+    return () => link.remove();
+  }, [url]);
+}
+
 export default function ListenerPage() {
   const { nowPlaying, status } = usePlayback();
   const message = useMessage();
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const audioRef = useRef(null);
+
+  usePreconnect(STREAM_URL);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.volume = volume;
@@ -23,12 +44,22 @@ export default function ListenerPage() {
   const trackKey = track?.rid || track?.filename || title;
 
   const toggleSound = () => {
-    if (!audioRef.current) return;
+    const audio = audioRef.current;
+    if (!audio) return;
     if (playing) {
-      audioRef.current.pause();
+      // A plain pause() leaves the connection to the (infinite, live)
+      // stream open in the background, so Icecast keeps counting this
+      // client as a listener. Dropping the src and reloading actually
+      // closes it, so the count only reflects people with sound on.
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.load();
       setPlaying(false);
     } else {
-      audioRef.current.play();
+      // Cache-bust so this is always a fresh connection joining live,
+      // never a browser-cached response replaying from an old offset.
+      audio.src = `${STREAM_URL}${STREAM_URL.includes("?") ? "&" : "?"}_=${Date.now()}`;
+      audio.play();
       setPlaying(true);
     }
   };
@@ -72,7 +103,7 @@ export default function ListenerPage() {
         </div>
       </div>
 
-      <audio ref={audioRef} src={STREAM_URL} preload="none" />
+      <audio ref={audioRef} preload="none" />
     </div>
   );
 }
