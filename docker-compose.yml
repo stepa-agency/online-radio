@@ -1,0 +1,40 @@
+services:
+  icecast:
+    build: ./icecast
+    container_name: radio-icecast
+    ports:
+      - "8000:8000"
+    environment:
+      ICECAST_SOURCE_PASSWORD: ${ICECAST_SOURCE_PASSWORD:-hackme}
+      ICECAST_ADMIN_PASSWORD: ${ICECAST_ADMIN_PASSWORD:-adminhackme}
+      ICECAST_RELAY_PASSWORD: ${ICECAST_RELAY_PASSWORD:-relayhackme}
+      ICECAST_HOSTNAME: icecast
+    volumes:
+      - icecast-logs:/var/log/icecast2
+    restart: unless-stopped
+    networks:
+      - radio
+
+  liquidsoap:
+    image: savonet/liquidsoap:v2.2.5
+    container_name: radio-liquidsoap
+    depends_on:
+      - icecast
+    ports:
+      - "1234:1234"
+    environment:
+      ICECAST_SOURCE_PASSWORD: ${ICECAST_SOURCE_PASSWORD:-hackme}
+    volumes:
+      - ./liquidsoap/radio.liq:/radio.liq:ro
+      - ./music:/music
+    command: ["/radio.liq"]
+    restart: unless-stopped
+    networks:
+      - radio
+
+networks:
+  radio:
+    driver: bridge
+
+volumes:
+  icecast-logs:

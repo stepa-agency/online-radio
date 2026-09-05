@@ -1,0 +1,7 @@
+.env
+.DS_Store
+node_modules/
+
+# don't commit actual audio files, just keep the folder
+music/*
+!music/.gitkeep
