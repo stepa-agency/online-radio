@@ -20,8 +20,14 @@ icecast_password = environment.get(default="hackme", "ICECAST_SOURCE_PASSWORD")
 #   telnet> queue.push /music/some-track.mp3
 queue = request.queue(id="queue")
 
+# Overlaps the last few seconds of one track with the first few of the
+# next instead of a hard cut — paired with the API pre-loading the next
+# track ahead of time (see autoAdvance.js's PRELOAD_SECONDS), this is what
+# keeps the air from ever going dead silent between songs.
+radio = crossfade(duration=3., fade_in=3., fade_out=3., queue)
+
 # Silence instead of crashing when the queue runs dry.
-radio = mksafe(queue)
+radio = mksafe(radio)
 
 # --- Output --------------------------------------------------------------
 

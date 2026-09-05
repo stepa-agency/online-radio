@@ -4,6 +4,14 @@ const liquidsoap = require("./liquidsoap");
 
 const MUSIC_DIR = process.env.MUSIC_DIR || "/music";
 
+// How close to the end of the current track we push the next one into
+// Liquidsoap's queue ahead of time. Liquidsoap plays queued requests back
+// to back with no gap of its own, so pre-loading before the current track
+// actually ends is what kills the silence — pushing reactively, only once
+// nothing is on air, always cost a few seconds of dead air waiting on this
+// poll loop plus the new request's own load time.
+const PRELOAD_SECONDS = 10;
+
 function parseFields(raw) {
   const fields = {};
   for (const line of raw.trim().split("\n")) {
@@ -15,10 +23,14 @@ function parseFields(raw) {
 
 let running = false;
 
-// Keeps the station fed: whatever's marked "playing" that's no longer
-// actually on air gets dropped, and if nothing is on air, the next queued
-// track is pushed. This is what makes the queue a real auto-advancing
-// playlist instead of something you have to click through track by track.
+// Keeps the station fed. Two jobs:
+//  - reconcile the DB against whatever Liquidsoap is actually doing: drop
+//    a 'playing' row once its track has genuinely left the air, and
+//    promote a 'cued' row to 'playing' once its track takes over;
+//  - once the on-air track is within PRELOAD_SECONDS of ending (or nothing
+//    is on air at all), push the next queued track into Liquidsoap right
+//    away and mark it 'cued' — it's already loaded and ready, so when the
+//    current track ends Liquidsoap moves on to it with no gap.
 async function tick() {
   if (running) return;
   running = true;
@@ -27,25 +39,37 @@ async function tick() {
     const onAirRid = onAirRaw.trim().split(/\s+/)[0] || null;
 
     let onAirFilename = null;
+    let remaining = null;
     if (onAirRid) {
-      const meta = await liquidsoap.sendCommand(`request.metadata ${onAirRid}`);
+      const [meta, rem] = await Promise.all([
+        liquidsoap.sendCommand(`request.metadata ${onAirRid}`),
+        liquidsoap.sendCommand("radio.remaining"),
+      ]);
       const fields = parseFields(meta);
       onAirFilename = fields.filename ? path.basename(fields.filename) : null;
+      remaining = Number(rem);
     }
 
-    const current = db.prepare("SELECT * FROM tracks WHERE status = 'playing'").get();
-    if (current && current.filename !== onAirFilename) {
-      db.prepare("DELETE FROM tracks WHERE id = ?").run(current.id);
+    const playing = db.prepare("SELECT * FROM tracks WHERE status = 'playing'").get();
+    if (playing && playing.filename !== onAirFilename) {
+      db.prepare("DELETE FROM tracks WHERE id = ?").run(playing.id);
     }
 
-    if (!onAirFilename) {
+    const cued = db.prepare("SELECT * FROM tracks WHERE status = 'cued'").get();
+    if (cued && cued.filename === onAirFilename) {
+      db.prepare("UPDATE tracks SET status = 'playing' WHERE id = ?").run(cued.id);
+    }
+
+    const stillCued = db.prepare("SELECT * FROM tracks WHERE status = 'cued'").get();
+    const readyToPreload = !onAirFilename || (remaining !== null && !Number.isNaN(remaining) && remaining <= PRELOAD_SECONDS);
+    if (!stillCued && readyToPreload) {
       const next = db
         .prepare("SELECT * FROM tracks WHERE status = 'queued' ORDER BY position ASC LIMIT 1")
         .get();
       if (next) {
         const filePath = path.join(MUSIC_DIR, next.filename);
         await liquidsoap.sendCommand(`queue.push ${filePath}`);
-        db.prepare("UPDATE tracks SET status = 'playing' WHERE id = ?").run(next.id);
+        db.prepare("UPDATE tracks SET status = ? WHERE id = ?").run(onAirFilename ? "cued" : "playing", next.id);
       }
     }
   } catch {

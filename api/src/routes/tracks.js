@@ -83,7 +83,10 @@ router.post("/:id/play-now", async (req, res) => {
     await liquidsoap.sendCommand("queue.flush_and_skip");
     const filePath = path.join(MUSIC_DIR, track.filename);
     await liquidsoap.sendCommand(`queue.push ${filePath}`);
-    db.prepare("DELETE FROM tracks WHERE status = 'playing' AND id != ?").run(track.id);
+    // flush_and_skip drops anything auto-advance had pre-loaded for later
+    // (see autoAdvance.js's 'cued' status), so that bookkeeping needs
+    // clearing too, not just whatever was 'playing'.
+    db.prepare("DELETE FROM tracks WHERE status IN ('playing', 'cued') AND id != ?").run(track.id);
     db.prepare("UPDATE tracks SET status = 'playing' WHERE id = ?").run(track.id);
     res.json({ ok: true });
   } catch (err) {
