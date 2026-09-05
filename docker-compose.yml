@@ -32,9 +32,30 @@ services:
     networks:
       - radio
 
+  api:
+    build: ./api
+    container_name: radio-api
+    depends_on:
+      - liquidsoap
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      LIQUIDSOAP_HOST: liquidsoap
+      LIQUIDSOAP_PORT: 1234
+      MUSIC_DIR: /music
+      DB_PATH: /data/queue.db
+    volumes:
+      - ./music:/music
+      - api-data:/data
+    restart: unless-stopped
+    networks:
+      - radio
+
 networks:
   radio:
     driver: bridge
 
 volumes:
   icecast-logs:
+  api-data:
