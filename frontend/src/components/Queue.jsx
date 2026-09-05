@@ -1,5 +1,6 @@
-export default function Queue({ tracks, onPlayNow, onDelete, busyId }) {
+export default function Queue({ tracks, onPlayNow, onDelete, onMove, busyId }) {
   const upcoming = tracks.filter((t) => t.status !== "playing");
+  const queuedOnly = tracks.filter((t) => t.status === "queued");
 
   return (
     <section className="queue">
@@ -16,7 +17,9 @@ export default function Queue({ tracks, onPlayNow, onDelete, busyId }) {
           <ol className="queue__list">
             {tracks.map((track) => {
               const isPlaying = track.status === "playing";
+              const isQueued = track.status === "queued";
               const upcomingIndex = upcoming.indexOf(track);
+              const queuedIndex = isQueued ? queuedOnly.indexOf(track) : -1;
               return (
                 <li key={track.id} className={`queue__item ${isPlaying ? "queue__item--playing" : ""}`}>
                   {isPlaying ? (
@@ -33,6 +36,26 @@ export default function Queue({ tracks, onPlayNow, onDelete, busyId }) {
                     {track.artist && <p className="queue__artist">{track.artist}</p>}
                   </div>
                   <div className="queue__actions">
+                    {isQueued && (
+                      <div className="queue__reorder">
+                        <button
+                          className="icon-button"
+                          onClick={() => onMove(track.id, "up")}
+                          disabled={busyId === track.id || queuedIndex === 0}
+                          aria-label="Выше"
+                        >
+                          ↑
+                        </button>
+                        <button
+                          className="icon-button"
+                          onClick={() => onMove(track.id, "down")}
+                          disabled={busyId === track.id || queuedIndex === queuedOnly.length - 1}
+                          aria-label="Ниже"
+                        >
+                          ↓
+                        </button>
+                      </div>
+                    )}
                     {!isPlaying && (
                       <button
                         className="pill pill--small"

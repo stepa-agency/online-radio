@@ -50,6 +50,18 @@ export default function AdminPage() {
     }
   };
 
+  const handleMove = async (id, direction) => {
+    setBusyId(id);
+    try {
+      await api.moveTrack(id, direction);
+      refreshTracks();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   const handlePlayNow = async (id) => {
     setBusyId(id);
     try {
@@ -100,7 +112,13 @@ export default function AdminPage() {
         <NowPlaying nowPlaying={nowPlaying} status={status} onSkip={handleSkip} skipping={skipping} />
 
         <div className="app__grid">
-          <Queue tracks={tracks} onPlayNow={handlePlayNow} onDelete={handleDelete} busyId={busyId} />
+          <Queue
+            tracks={tracks}
+            onPlayNow={handlePlayNow}
+            onDelete={handleDelete}
+            onMove={handleMove}
+            busyId={busyId}
+          />
           <div className="app__side">
             <UploadForm onUpload={handleUpload} />
             <MessageForm initialText={message} onSave={handleSaveMessage} />

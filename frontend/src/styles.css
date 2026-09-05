@@ -462,6 +462,18 @@ input {
   flex-shrink: 0;
 }
 
+.queue__reorder {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.queue__reorder .icon-button {
+  width: 26px;
+  height: 26px;
+  font-size: 11px;
+}
+
 /* ---- upload ---- */
 .upload__form {
   display: flex;

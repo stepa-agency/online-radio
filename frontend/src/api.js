@@ -16,6 +16,12 @@ export const api = {
   uploadTrack: (formData) => request("/api/tracks", { method: "POST", body: formData }),
   deleteTrack: (id) => request(`/api/tracks/${id}`, { method: "DELETE" }),
   playNow: (id) => request(`/api/tracks/${id}/play-now`, { method: "POST" }),
+  moveTrack: (id, direction) =>
+    request(`/api/tracks/${id}/move`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ direction }),
+    }),
   skip: () => request("/api/skip", { method: "POST" }),
   nowPlaying: () => request("/api/now-playing"),
   status: () => request("/api/status"),

@@ -72,6 +72,43 @@ router.delete("/:id", async (req, res) => {
   res.status(204).end();
 });
 
+// Swaps this track's spot in the queue with the neighbor immediately above
+// or below it. Only 'queued' tracks are reorderable — whatever's 'playing'
+// is already on air, and a 'cued' track has already been handed to
+// Liquidsoap for the moment the current one ends, so moving it in our own
+// list wouldn't actually change what plays next.
+router.post("/:id/move", (req, res) => {
+  const { direction } = req.body || {};
+  if (direction !== "up" && direction !== "down") {
+    return res.status(400).json({ error: 'direction must be "up" or "down"' });
+  }
+
+  const track = db.prepare("SELECT * FROM tracks WHERE id = ?").get(req.params.id);
+  if (!track) return res.status(404).json({ error: "Track not found" });
+  if (track.status !== "queued") {
+    return res.status(400).json({ error: "Only queued tracks can be reordered" });
+  }
+
+  const neighbor =
+    direction === "up"
+      ? db
+          .prepare("SELECT * FROM tracks WHERE status = 'queued' AND position < ? ORDER BY position DESC LIMIT 1")
+          .get(track.position)
+      : db
+          .prepare("SELECT * FROM tracks WHERE status = 'queued' AND position > ? ORDER BY position ASC LIMIT 1")
+          .get(track.position);
+
+  if (!neighbor) return res.json({ ok: true }); // already at that end of the queue
+
+  const swap = db.transaction(() => {
+    db.prepare("UPDATE tracks SET position = ? WHERE id = ?").run(neighbor.position, track.id);
+    db.prepare("UPDATE tracks SET position = ? WHERE id = ?").run(track.position, neighbor.id);
+  });
+  swap();
+
+  res.json({ ok: true });
+});
+
 // Cuts off whatever's on air (if anything) and plays this track immediately,
 // ahead of the rest of the queue. The auto-advance loop picks up from here
 // once it finishes — normal queue order resumes after it.
