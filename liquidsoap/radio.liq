@@ -9,7 +9,7 @@ settings.server.telnet.set(true)
 settings.server.telnet.bind_addr.set("0.0.0.0")
 settings.server.telnet.port.set(1234)
 
-icecast_password = getenv("ICECAST_SOURCE_PASSWORD")
+icecast_password = environment.get(default="hackme", "ICECAST_SOURCE_PASSWORD")
 
 # --- Sources -----------------------------------------------------------
 
@@ -26,8 +26,7 @@ music = playlist(id="music", mode="normal", reload_mode="watch", "/music")
 
 # Queued requests take priority over the background rotation; whichever
 # is currently playing advances to the next track automatically.
-#   telnet> radio.skip     -> skip whatever is currently playing
-radio = fallback(id="radio", track_sensitive=false, [queue, music])
+radio = fallback(track_sensitive=false, [queue, music])
 
 # Never let the stream die: fall back to silence instead of crashing if
 # both the queue and the music folder are empty.
@@ -35,8 +34,12 @@ radio = mksafe(radio)
 
 # --- Output --------------------------------------------------------------
 
+# id="radio" is what makes the skip command below "radio.skip" — without an
+# explicit id, Liquidsoap derives one from `name`, which is less predictable.
+#   telnet> radio.skip     -> skip whatever is currently playing
 output.icecast(
   %mp3(bitrate=128),
+  id="radio",
   host="icecast",
   port=8000,
   password=icecast_password,
