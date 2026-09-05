@@ -685,39 +685,39 @@ input {
 }
 
 .bloub-peek--top {
-  top: -250px;
+  top: var(--bloub-hidden, -170px);
   left: var(--bloub-pos, 50%);
-  transform: translate(-50%, 0);
+  transform: translate(-50%, 0) rotate(var(--bloub-rot, 0deg));
 }
 .bloub-peek--top[data-visible="true"] {
-  transform: translate(-50%, 230px);
+  transform: translate(-50%, var(--bloub-enter, 160px)) rotate(var(--bloub-rot, 0deg));
 }
 
 .bloub-peek--bottom {
-  bottom: -250px;
+  bottom: var(--bloub-hidden, -170px);
   left: var(--bloub-pos, 50%);
-  transform: translate(-50%, 0);
+  transform: translate(-50%, 0) rotate(var(--bloub-rot, 0deg));
 }
 .bloub-peek--bottom[data-visible="true"] {
-  transform: translate(-50%, -230px);
+  transform: translate(-50%, calc(var(--bloub-enter, 160px) * -1)) rotate(var(--bloub-rot, 0deg));
 }
 
 .bloub-peek--left {
-  left: -250px;
+  left: var(--bloub-hidden, -170px);
   top: var(--bloub-pos, 50%);
-  transform: translate(0, -50%);
+  transform: translate(0, -50%) rotate(var(--bloub-rot, 0deg));
 }
 .bloub-peek--left[data-visible="true"] {
-  transform: translate(230px, -50%);
+  transform: translate(var(--bloub-enter, 160px), -50%) rotate(var(--bloub-rot, 0deg));
 }
 
 .bloub-peek--right {
-  right: -250px;
+  right: var(--bloub-hidden, -170px);
   top: var(--bloub-pos, 50%);
-  transform: translate(0, -50%);
+  transform: translate(0, -50%) rotate(var(--bloub-rot, 0deg));
 }
 .bloub-peek--right[data-visible="true"] {
-  transform: translate(-230px, -50%);
+  transform: translate(calc(var(--bloub-enter, 160px) * -1), -50%) rotate(var(--bloub-rot, 0deg));
 }
 
 /* ---- listener count ---- */

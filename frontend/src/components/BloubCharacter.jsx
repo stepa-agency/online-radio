@@ -3,7 +3,7 @@ import "../vendor/bloub/register.js";
 
 // IDs read straight out of the vendored bot/skins.ts and bot/expressions.ts —
 // they're not arbitrary strings, defineCustomElement rejects anything else.
-const SHAPES = ["cercle", "galet", "squircle", "capsule", "triangle", "hexagone", "nuage", "goutte"];
+export const SHAPES = ["cercle", "galet", "squircle", "capsule", "triangle", "hexagone", "nuage", "goutte"];
 const COLORS = [
   "encre",
   "brun",
@@ -18,7 +18,7 @@ const COLORS = [
   "gris",
   "creme",
 ];
-const EXPRESSIONS = [
+export const EXPRESSIONS = [
   "neutre",
   "attentif",
   "surpris",
@@ -49,15 +49,14 @@ function pick(list, seed, salt) {
   return list[hash(`${seed}:${salt}`) % list.length];
 }
 
-// One track -> one consistent look, so the same song always comes back as
-// the same little guy instead of re-rolling on every poll.
-export default function BloubCharacter({ trackKey, active, size = 220 }) {
+// One track -> one consistent color, so the same song always comes back as
+// the same-colored little guy. Shape and expression are handed down by
+// BloubPeek instead — those re-roll on every appearance, not just per track.
+export default function BloubCharacter({ trackKey, active, shape, expression, size = 220 }) {
   const elRef = useRef(null);
   const seed = trackKey || "silence";
 
-  const shape = pick(SHAPES, seed, "shape");
   const color = pick(COLORS, seed, "color");
-  const expression = pick(EXPRESSIONS, seed, "expression");
 
   useEffect(() => {
     const el = elRef.current;
