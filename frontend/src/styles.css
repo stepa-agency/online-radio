@@ -676,69 +676,10 @@ input {
   background: var(--ink);
 }
 
-/* ---- ambient glow ---- */
-.glow {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.glow__blob {
-  position: absolute;
-  width: 46vw;
-  height: 46vw;
-  max-width: 560px;
-  max-height: 560px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 59, 47, 0.16), rgba(255, 59, 47, 0) 70%);
-  filter: blur(50px);
-  opacity: 0;
-  animation: glow-breathe 10s ease-in-out infinite;
-}
-
-.glow__blob--tl {
-  top: -16%;
-  left: -16%;
-  animation-delay: 0s;
-}
-
-.glow__blob--tr {
-  top: -16%;
-  right: -16%;
-  animation-delay: 2.5s;
-}
-
-.glow__blob--bl {
-  bottom: -16%;
-  left: -16%;
-  animation-delay: 5s;
-}
-
-.glow__blob--br {
-  bottom: -16%;
-  right: -16%;
-  animation-delay: 7.5s;
-}
-
-@keyframes glow-breathe {
-  0%,
-  100% {
-    opacity: 0;
-    transform: scale(0.85);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.05);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .glow__blob {
-    animation: none;
-    opacity: 0.5;
-  }
+/* ---- bloub character ---- */
+.listener__character {
+  display: flex;
+  justify-content: center;
 }
 
 /* ---- toast ---- */

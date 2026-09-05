@@ -2,14 +2,25 @@ import { useRef, useState } from "react";
 
 export default function UploadForm({ onUpload }) {
   const fileInputRef = useRef(null);
-  const [fileName, setFileName] = useState("");
+  const [fileLabel, setFileLabel] = useState("");
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
 
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) {
+      setFileLabel("");
+    } else if (files.length === 1) {
+      setFileLabel(files[0].name);
+    } else {
+      setFileLabel(`Выбрано треков: ${files.length}`);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const file = fileInputRef.current?.files?.[0];
-    if (!file) {
+    const files = fileInputRef.current?.files;
+    if (!files || files.length === 0) {
       setError("Выбери файл");
       return;
     }
@@ -17,9 +28,11 @@ export default function UploadForm({ onUpload }) {
     setError(null);
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      for (const file of files) {
+        formData.append("file", file);
+      }
       await onUpload(formData);
-      setFileName("");
+      setFileLabel("");
       fileInputRef.current.value = "";
     } catch (err) {
       setError(err.message);
@@ -30,16 +43,11 @@ export default function UploadForm({ onUpload }) {
 
   return (
     <section className="upload">
-      <p className="label">Добавить трек</p>
+      <p className="label">Добавить треки</p>
       <form className="upload__form" onSubmit={handleSubmit}>
         <label className="upload__dropzone">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".mp3,.ogg,.wav,.flac,.m4a"
-            onChange={(e) => setFileName(e.target.files?.[0]?.name || "")}
-          />
-          <span>{fileName || "mp3, ogg, wav, flac, m4a"}</span>
+          <input ref={fileInputRef} type="file" multiple accept=".mp3,.ogg,.wav,.flac,.m4a" onChange={handleFileChange} />
+          <span>{fileLabel || "mp3, ogg, wav, flac, m4a — можно выбрать сразу несколько"}</span>
         </label>
 
         {error && <p className="upload__error">{error}</p>}

@@ -40,18 +40,20 @@ router.get("/", (req, res) => {
   res.json(tracks);
 });
 
-router.post("/", upload.single("file"), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded (expected field "file")' });
+router.post("/", upload.array("file", 25), (req, res) => {
+  if (!req.files || req.files.length === 0) {
+    return res.status(400).json({ error: 'No files uploaded (expected field "file")' });
   }
-  const { title, artist } = req.body;
-  const maxPosition = db.prepare("SELECT COALESCE(MAX(position), 0) AS max FROM tracks").get().max;
-  const info = db
-    .prepare("INSERT INTO tracks (filename, title, artist, position) VALUES (?, ?, ?, ?)")
-    .run(req.file.filename, title || req.file.originalname, artist || null, maxPosition + 1);
 
-  const track = db.prepare("SELECT * FROM tracks WHERE id = ?").get(info.lastInsertRowid);
-  res.status(201).json(track);
+  const maxPosition = db.prepare("SELECT COALESCE(MAX(position), 0) AS max FROM tracks").get().max;
+  const insert = db.prepare("INSERT INTO tracks (filename, title, position) VALUES (?, ?, ?)");
+
+  const tracks = req.files.map((file, i) => {
+    const info = insert.run(file.filename, file.originalname, maxPosition + i + 1);
+    return db.prepare("SELECT * FROM tracks WHERE id = ?").get(info.lastInsertRowid);
+  });
+
+  res.status(201).json(tracks);
 });
 
 router.delete("/:id", async (req, res) => {
