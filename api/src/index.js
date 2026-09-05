@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const db = require("./db");
 const tracksRouter = require("./routes/tracks");
 const controlRouter = require("./routes/control");
 
@@ -17,4 +18,14 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`API listening on port ${PORT}`));
+const server = app.listen(PORT, () => console.log(`API listening on port ${PORT}`));
+
+function shutdown() {
+  server.close(() => {
+    db.close();
+    process.exit(0);
+  });
+}
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

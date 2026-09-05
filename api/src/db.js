@@ -6,7 +6,15 @@ const DB_PATH = process.env.DB_PATH || path.join(__dirname, "..", "data", "queue
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true });
 
 const db = new Database(DB_PATH);
-db.pragma("journal_mode = WAL");
+
+// Single writer, low volume: the default rollback journal commits straight
+// to the main file after every transaction. WAL buffers writes in a
+// separate file until checkpointed, which was silently losing rows here
+// whenever the container was killed before a checkpoint happened. Journal
+// mode is stored in the file itself, so this must be set explicitly even
+// though we never opt into WAL — an older run of this file may have left
+// it in WAL mode.
+db.pragma("journal_mode = DELETE");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS tracks (
