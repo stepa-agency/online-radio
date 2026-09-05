@@ -3,6 +3,7 @@ const cors = require("cors");
 const db = require("./db");
 const tracksRouter = require("./routes/tracks");
 const controlRouter = require("./routes/control");
+const messageRouter = require("./routes/message");
 
 const app = express();
 app.use(cors());
@@ -11,6 +12,7 @@ app.use(express.json());
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/tracks", tracksRouter);
 app.use("/api", controlRouter);
+app.use("/api", messageRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

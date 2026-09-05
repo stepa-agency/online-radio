@@ -19,4 +19,11 @@ export const api = {
   skip: () => request("/api/skip", { method: "POST" }),
   nowPlaying: () => request("/api/now-playing"),
   status: () => request("/api/status"),
+  getMessage: () => request("/api/message"),
+  setMessage: (text) =>
+    request("/api/message", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text }),
+    }),
 };
