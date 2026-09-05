@@ -51,7 +51,7 @@ function pick(list, seed, salt) {
 
 // One track -> one consistent look, so the same song always comes back as
 // the same little guy instead of re-rolling on every poll.
-export default function BloubCharacter({ trackKey, playing, size = 220 }) {
+export default function BloubCharacter({ trackKey, active, size = 220 }) {
   const elRef = useRef(null);
   const seed = trackKey || "silence";
 
@@ -67,11 +67,20 @@ export default function BloubCharacter({ trackKey, playing, size = 220 }) {
     el.expression = expression;
   }, [shape, color, expression]);
 
+  // 'idle' and 'swirl' are the only two of bloub's 14 states with a real
+  // face (baseFace: true) — the rest turn the body into an object (a "!",
+  // an egg, a burst of dots, a comet...), which is exactly what we don't
+  // want. So every appearance is just a one-off swirl-then-settle, never
+  // the built-in demo reel (which cycles through all 14).
   useEffect(() => {
     const el = elRef.current;
-    if (!el) return;
-    el.playing = Boolean(playing);
-  }, [playing]);
+    if (!el || !active) return;
+    el.state = "swirl";
+    const t = setTimeout(() => {
+      el.state = "idle";
+    }, 1400);
+    return () => clearTimeout(t);
+  }, [active]);
 
   return <bloub-bot ref={elRef} size={size} paper="#ffffff" />;
 }

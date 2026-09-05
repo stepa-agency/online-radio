@@ -3,10 +3,11 @@ import { usePlayback } from "../hooks/usePlayback";
 import { useMessage } from "../hooks/useMessage";
 import { STREAM_URL } from "../api";
 import SoundIcon from "../components/SoundIcon.jsx";
-import BloubCharacter from "../components/BloubCharacter.jsx";
+import BloubPeek from "../components/BloubPeek.jsx";
+import ListenerCount from "../components/ListenerCount.jsx";
 
 export default function ListenerPage() {
-  const { nowPlaying } = usePlayback();
+  const { nowPlaying, status } = usePlayback();
   const message = useMessage();
   const [playing, setPlaying] = useState(false);
   const [volume, setVolume] = useState(0.8);
@@ -34,6 +35,9 @@ export default function ListenerPage() {
 
   return (
     <div className="listener">
+      <BloubPeek trackKey={trackKey} onAir={Boolean(track)} />
+      <ListenerCount count={status?.listeners} />
+
       <div className="listener__content">
         <div className="listener__brand">
           <span className="bullet" />
@@ -44,10 +48,6 @@ export default function ListenerPage() {
         <div className="listener__top">
           {title && <p className="listener__title">{title}</p>}
           {artist && <p className="listener__artist">{artist}</p>}
-        </div>
-
-        <div className="listener__character">
-          <BloubCharacter trackKey={trackKey} playing={Boolean(track)} size={180} />
         </div>
 
         <div className="listener__message-wrap">
