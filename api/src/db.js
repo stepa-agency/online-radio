@@ -33,4 +33,12 @@ db.exec(`
   );
 `);
 
+// duration_seconds was added after the table already existed in production —
+// CREATE TABLE IF NOT EXISTS above is a no-op on an existing file, so the
+// column has to be added out-of-band, once, for anyone upgrading in place.
+const hasDuration = db.prepare("PRAGMA table_info(tracks)").all().some((col) => col.name === "duration_seconds");
+if (!hasDuration) {
+  db.exec("ALTER TABLE tracks ADD COLUMN duration_seconds REAL");
+}
+
 module.exports = db;

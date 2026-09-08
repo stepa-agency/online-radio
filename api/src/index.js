@@ -4,6 +4,7 @@ const db = require("./db");
 const tracksRouter = require("./routes/tracks");
 const controlRouter = require("./routes/control");
 const messageRouter = require("./routes/message");
+const likesRouter = require("./routes/likes");
 const { startAutoAdvance } = require("./autoAdvance");
 
 const app = express();
@@ -14,6 +15,7 @@ app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.use("/api/tracks", tracksRouter);
 app.use("/api", controlRouter);
 app.use("/api", messageRouter);
+app.use("/api", likesRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);

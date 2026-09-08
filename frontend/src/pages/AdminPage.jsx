@@ -118,6 +118,7 @@ export default function AdminPage() {
             onDelete={handleDelete}
             onMove={handleMove}
             busyId={busyId}
+            secondsLeft={status?.queueSecondsLeft}
           />
           <div className="app__side">
             <UploadForm onUpload={handleUpload} />

@@ -10,7 +10,7 @@ const MUSIC_DIR = process.env.MUSIC_DIR || "/music";
 // actually ends is what kills the silence — pushing reactively, only once
 // nothing is on air, always cost a few seconds of dead air waiting on this
 // poll loop plus the new request's own load time.
-const PRELOAD_SECONDS = 10;
+const PRELOAD_SECONDS = 15;
 
 function parseFields(raw) {
   const fields = {};

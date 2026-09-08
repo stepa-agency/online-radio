@@ -1,6 +1,7 @@
 const express = require("express");
 const multer = require("multer");
 const path = require("path");
+const mm = require("music-metadata");
 const db = require("../db");
 const liquidsoap = require("../liquidsoap");
 
@@ -40,16 +41,31 @@ router.get("/", (req, res) => {
   res.json(tracks);
 });
 
-router.post("/", upload.array("file", 25), (req, res) => {
+router.post("/", upload.array("file", 25), async (req, res) => {
   if (!req.files || req.files.length === 0) {
     return res.status(400).json({ error: 'No files uploaded (expected field "file")' });
   }
 
+  // Reading duration needs to open and parse each file, which is too slow
+  // to do inside the DB transaction below — resolve them all up front.
+  const durations = await Promise.all(
+    req.files.map(async (file) => {
+      try {
+        const metadata = await mm.parseFile(path.join(MUSIC_DIR, file.filename));
+        return metadata.format.duration || null;
+      } catch {
+        return null;
+      }
+    })
+  );
+
   const maxPosition = db.prepare("SELECT COALESCE(MAX(position), 0) AS max FROM tracks").get().max;
-  const insert = db.prepare("INSERT INTO tracks (filename, title, position) VALUES (?, ?, ?)");
+  const insert = db.prepare(
+    "INSERT INTO tracks (filename, title, position, duration_seconds) VALUES (?, ?, ?, ?)"
+  );
 
   const tracks = req.files.map((file, i) => {
-    const info = insert.run(file.filename, file.originalname, maxPosition + i + 1);
+    const info = insert.run(file.filename, file.originalname, maxPosition + i + 1, durations[i]);
     return db.prepare("SELECT * FROM tracks WHERE id = ?").get(info.lastInsertRowid);
   });
 

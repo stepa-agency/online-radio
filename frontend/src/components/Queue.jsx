@@ -1,12 +1,23 @@
-export default function Queue({ tracks, onPlayNow, onDelete, onMove, busyId }) {
+function formatMinutesLeft(seconds) {
+  if (!seconds || seconds <= 0) return null;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 1) return "меньше минуты";
+  if (minutes === 1) return "1 минуту";
+  if (minutes < 5) return `${minutes} минуты`;
+  return `${minutes} минут`;
+}
+
+export default function Queue({ tracks, onPlayNow, onDelete, onMove, busyId, secondsLeft }) {
   const upcoming = tracks.filter((t) => t.status !== "playing");
   const queuedOnly = tracks.filter((t) => t.status === "queued");
+  const minutesLeft = formatMinutesLeft(secondsLeft);
 
   return (
     <section className="queue">
       <div className="queue__header">
         <p className="label">Очередь</p>
         <span className="badge">{tracks.length}</span>
+        {minutesLeft && <span className="queue__runway">хватит на {minutesLeft}</span>}
       </div>
 
       {tracks.length === 0 ? (

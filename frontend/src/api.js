@@ -1,4 +1,4 @@
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
+export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3001";
 export const STREAM_URL = import.meta.env.VITE_STREAM_URL || "http://localhost:8000/stream";
 
 async function request(path, options) {
@@ -26,6 +26,7 @@ export const api = {
   nowPlaying: () => request("/api/now-playing"),
   status: () => request("/api/status"),
   getMessage: () => request("/api/message"),
+  like: () => request("/api/likes", { method: "POST" }),
   setMessage: (text) =>
     request("/api/message", {
       method: "PUT",

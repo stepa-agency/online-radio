@@ -1,5 +1,6 @@
 const express = require("express");
 const liquidsoap = require("../liquidsoap");
+const db = require("../db");
 
 const ICECAST_STATUS_URL =
   process.env.ICECAST_STATUS_URL || "http://icecast:8000/status-json.xsl";
@@ -46,13 +47,35 @@ router.get("/now-playing", async (req, res) => {
 });
 
 router.get("/status", async (req, res) => {
+  // Sum of what's left to play: the remaining seconds of whatever's on air
+  // right now, plus the full duration of everything still queued behind it.
+  // Tracks uploaded before duration capture existed have a null duration —
+  // those just don't contribute a number, rather than breaking the total.
+  const queued = db
+    .prepare("SELECT COALESCE(SUM(duration_seconds), 0) AS total FROM tracks WHERE status IN ('queued', 'cued')")
+    .get().total;
+  let remaining = 0;
+  try {
+    const onAir = await liquidsoap.sendCommand("request.on_air");
+    if (onAir.trim()) {
+      const rem = await liquidsoap.sendCommand("radio.remaining");
+      remaining = Number(rem) || 0;
+    }
+  } catch {
+    // Liquidsoap unreachable — fall back to just the queued total.
+  }
+
   try {
     const response = await fetch(ICECAST_STATUS_URL);
     const data = await response.json();
     const source = data?.icestats?.source;
-    res.json({ live: Boolean(source), listeners: source?.listeners ?? 0 });
+    res.json({
+      live: Boolean(source),
+      listeners: source?.listeners ?? 0,
+      queueSecondsLeft: queued + remaining,
+    });
   } catch (err) {
-    res.json({ live: false, listeners: 0 });
+    res.json({ live: false, listeners: 0, queueSecondsLeft: queued + remaining });
   }
 });
 
