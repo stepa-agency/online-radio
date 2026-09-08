@@ -11,12 +11,10 @@
   "dependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^6.26.2",
-    "vue": "^3.5.13"
+    "react-router-dom": "^6.26.2"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
-    "@vitejs/plugin-vue": "^5.2.1",
     "vite": "^5.4.0"
   }
 }

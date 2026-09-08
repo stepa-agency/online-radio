@@ -5,7 +5,6 @@ import { STREAM_URL } from "../api";
 import TrackRing from "../components/TrackRing.jsx";
 import PlayButton from "../components/PlayButton.jsx";
 import LikeHearts from "../components/LikeHearts.jsx";
-import BloubPeek from "../components/BloubPeek.jsx";
 import ListenerCount from "../components/ListenerCount.jsx";
 
 // Warms up the DNS/TLS/TCP handshake to the stream host ahead of the first
@@ -46,7 +45,6 @@ export default function ListenerPage() {
   const track = nowPlaying?.current;
   const title = track?.title || track?.album || "";
   const artist = track?.artist || track?.albumartist || track?.album_artist || "";
-  const trackKey = track?.rid || track?.filename || title;
   const ringTitle = artist ? `${title} — ${artist}` : title;
 
   const startSound = () => {
@@ -87,14 +85,13 @@ export default function ListenerPage() {
 
   return (
     <div className="listener">
-      <BloubPeek trackKey={trackKey} onAir={Boolean(track)} />
       <ListenerCount count={status?.listeners} />
 
       <div className="listener__content">
         <div className="listener__brand">
-          <span className="bullet" />
-          <span className="listener__brand-text">The Radio</span>
-          <span className="bullet" />
+          <span className="listener__brand-text">
+            The Stëpa <span className="listener__brand-accent">RADIO</span>
+          </span>
         </div>
 
         <div className="listener__stage">

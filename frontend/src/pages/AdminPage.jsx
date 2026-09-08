@@ -96,9 +96,9 @@ export default function AdminPage() {
     <div className="app">
       <header className="app__header app__header--admin">
         <div className="logo">
-          <span className="bullet" />
-          <span className="logo__text">The Radio</span>
-          <span className="bullet" />
+          <span className="logo__text">
+            The Stëpa <span className="logo__accent">RADIO</span>
+          </span>
         </div>
         <div className="app__header-right">
           <span className="badge badge--admin">Админка</span>
