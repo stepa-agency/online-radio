@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { usePlayback } from "../hooks/usePlayback";
 import { useMessage } from "../hooks/useMessage";
 import { STREAM_URL } from "../api";
-import TrackRing from "../components/TrackRing.jsx";
 import PlayButton from "../components/PlayButton.jsx";
 import LikeHearts from "../components/LikeHearts.jsx";
 import Chat from "../components/Chat.jsx";
@@ -93,18 +92,19 @@ export default function ListenerPage() {
         </div>
 
         <div className="listener__stage">
-          <div className="listener__ring-wrap">
-            <TrackRing title={ringTitle} message={message} />
-
-            <div className="listener__center">
-              <PlayButton state={soundState} onClick={togglePlay} />
-            </div>
+          <div className="listener__now">
+            {ringTitle && <p className="listener__now-title">{ringTitle}</p>}
+            {message && <p className="listener__now-message">{message}</p>}
           </div>
 
           <LikeHearts />
         </div>
 
         <div className="listener__controls">
+          <div className="listener__play-tile">
+            <PlayButton state={soundState} onClick={togglePlay} />
+          </div>
+
           <div className="listener__volume-wrap">
             <input
               className="listener__volume"
