@@ -12,6 +12,16 @@ const MUSIC_DIR = process.env.MUSIC_DIR || "/music";
 // poll loop plus the new request's own load time.
 const PRELOAD_SECONDS = 15;
 
+// A request Liquidsoap can't actually play (corrupt file, unsupported
+// codec) just vanishes on its end without ever coming on air — no error
+// surfaces here, the 'cued' row just never gets promoted to 'playing'.
+// Without a timeout that stalls the whole queue forever behind one bad
+// file. 30s comfortably clears the normal wait (up to PRELOAD_SECONDS for
+// the current track to finish) before it's treated as failed.
+const CUED_TIMEOUT_MS = 30000;
+let cuedTrackId = null;
+let cuedSince = null;
+
 function parseFields(raw) {
   const fields = {};
   for (const line of raw.trim().split("\n")) {
@@ -58,6 +68,20 @@ async function tick() {
     const cued = db.prepare("SELECT * FROM tracks WHERE status = 'cued'").get();
     if (cued && cued.filename === onAirFilename) {
       db.prepare("UPDATE tracks SET status = 'playing' WHERE id = ?").run(cued.id);
+      cuedTrackId = null;
+      cuedSince = null;
+    } else if (cued) {
+      if (cued.id !== cuedTrackId) {
+        cuedTrackId = cued.id;
+        cuedSince = Date.now();
+      } else if (Date.now() - cuedSince > CUED_TIMEOUT_MS) {
+        db.prepare("DELETE FROM tracks WHERE id = ?").run(cued.id);
+        cuedTrackId = null;
+        cuedSince = null;
+      }
+    } else {
+      cuedTrackId = null;
+      cuedSince = null;
     }
 
     const stillCued = db.prepare("SELECT * FROM tracks WHERE status = 'cued'").get();

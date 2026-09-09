@@ -27,6 +27,13 @@ export const api = {
   status: () => request("/api/status"),
   getMessage: () => request("/api/message"),
   like: () => request("/api/likes", { method: "POST" }),
+  getChat: () => request("/api/chat"),
+  postChat: (nickname, text) =>
+    request("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nickname, text }),
+    }),
   setMessage: (text) =>
     request("/api/message", {
       method: "PUT",

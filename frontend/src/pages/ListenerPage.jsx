@@ -6,6 +6,7 @@ import TrackRing from "../components/TrackRing.jsx";
 import PlayButton from "../components/PlayButton.jsx";
 import LikeHearts from "../components/LikeHearts.jsx";
 import ListenerCount from "../components/ListenerCount.jsx";
+import Chat from "../components/Chat.jsx";
 
 // Warms up the DNS/TLS/TCP handshake to the stream host ahead of the first
 // click, without ever requesting the stream itself — a <link preconnect>
@@ -86,6 +87,7 @@ export default function ListenerPage() {
   return (
     <div className="listener">
       <ListenerCount count={status?.listeners} />
+      <Chat />
 
       <div className="listener__content">
         <div className="listener__brand">
@@ -106,17 +108,20 @@ export default function ListenerPage() {
           <LikeHearts />
 
           <div className="listener__controls">
-            <input
-              className="listener__volume"
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={displayedVolume}
-              onChange={handleVolumeChange}
-              style={{ "--vol": displayedVolume }}
-              aria-label="Громкость"
-            />
+            <div className="listener__volume-wrap">
+              <input
+                className="listener__volume"
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={displayedVolume}
+                onChange={handleVolumeChange}
+                style={{ "--vol": displayedVolume }}
+                aria-label="Громкость"
+              />
+              <span className="listener__volume-value">{Math.round(displayedVolume * 100)}</span>
+            </div>
           </div>
         </div>
       </div>

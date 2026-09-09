@@ -5,6 +5,7 @@ const tracksRouter = require("./routes/tracks");
 const controlRouter = require("./routes/control");
 const messageRouter = require("./routes/message");
 const likesRouter = require("./routes/likes");
+const chatRouter = require("./routes/chat");
 const { startAutoAdvance } = require("./autoAdvance");
 
 const app = express();
@@ -16,6 +17,7 @@ app.use("/api/tracks", tracksRouter);
 app.use("/api", controlRouter);
 app.use("/api", messageRouter);
 app.use("/api", likesRouter);
+app.use("/api", chatRouter);
 
 app.use((err, req, res, next) => {
   console.error(err);
