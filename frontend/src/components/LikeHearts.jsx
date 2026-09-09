@@ -1,12 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { API_BASE, api } from "../api";
 
 let nextId = 0;
 
+// A rounder, fuller heart than the last one (which read as clipped at
+// small sizes) plus a gradient fill and a glossy highlight for some
+// actual depth — this is the "like" button, it should feel satisfying to
+// mash. useId keeps the gradient's id unique so multiple hearts on screen
+// at once (the button plus however many particles are mid-flight) don't
+// collide on the same DOM id.
 function HeartIcon() {
+  const gradId = useId();
   return (
-    <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 21s-7.5-4.7-10-9.3C.5 8.4 2 5 5.4 5c1.9 0 3.4 1 4.6 2.7C11.2 6 12.7 5 14.6 5 18 5 19.5 8.4 22 11.7 19.5 16.3 12 21 12 21z" />
+    <svg viewBox="0 0 24 24">
+      <defs>
+        <linearGradient id={gradId} x1="0" y1="0" x2="0.15" y2="1">
+          <stop offset="0%" stopColor="#ffab6e" />
+          <stop offset="55%" stopColor="#ff590c" />
+          <stop offset="100%" stopColor="#e6390a" />
+        </linearGradient>
+      </defs>
+      <path
+        fill={`url(#${gradId})`}
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+      />
+      <ellipse cx="7.6" cy="7.4" rx="2.3" ry="1.3" fill="rgba(255,255,255,0.4)" transform="rotate(-40 7.6 7.4)" />
     </svg>
   );
 }

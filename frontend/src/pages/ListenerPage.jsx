@@ -5,7 +5,6 @@ import { STREAM_URL } from "../api";
 import TrackRing from "../components/TrackRing.jsx";
 import PlayButton from "../components/PlayButton.jsx";
 import LikeHearts from "../components/LikeHearts.jsx";
-import ListenerCount from "../components/ListenerCount.jsx";
 import Chat from "../components/Chat.jsx";
 
 // Warms up the DNS/TLS/TCP handshake to the stream host ahead of the first
@@ -86,10 +85,7 @@ export default function ListenerPage() {
 
   return (
     <div className="listener">
-      <ListenerCount count={status?.listeners} />
-      <Chat />
-
-      <div className="listener__content">
+      <div className="listener__main">
         <div className="listener__brand">
           <span className="listener__brand-text">
             The Stëpa <span className="listener__brand-accent">RADIO</span>
@@ -106,25 +102,27 @@ export default function ListenerPage() {
           </div>
 
           <LikeHearts />
+        </div>
 
-          <div className="listener__controls">
-            <div className="listener__volume-wrap">
-              <input
-                className="listener__volume"
-                type="range"
-                min="0"
-                max="1"
-                step="0.01"
-                value={displayedVolume}
-                onChange={handleVolumeChange}
-                style={{ "--vol": displayedVolume }}
-                aria-label="Громкость"
-              />
-              <span className="listener__volume-value">{Math.round(displayedVolume * 100)}</span>
-            </div>
+        <div className="listener__controls">
+          <div className="listener__volume-wrap">
+            <input
+              className="listener__volume"
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={displayedVolume}
+              onChange={handleVolumeChange}
+              style={{ "--vol": displayedVolume }}
+              aria-label="Громкость"
+            />
+            <span className="listener__volume-value">{Math.round(displayedVolume * 100)}</span>
           </div>
         </div>
       </div>
+
+      <Chat listenerCount={status?.listeners} />
 
       <audio
         ref={audioRef}
